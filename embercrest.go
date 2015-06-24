@@ -8,7 +8,6 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/lib/pq"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/fortytw2/embercrest/api"

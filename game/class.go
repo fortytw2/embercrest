@@ -1,6 +1,7 @@
 package game
 
 type Class struct {
+	ID   int    `json:"-"`
 	Name string `json:"class_name"`
 
 	// Class costs

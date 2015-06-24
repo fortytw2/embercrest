@@ -5,6 +5,7 @@ import (
 
 	"github.com/fortytw2/embercrest/datastore"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 // NewDatastore creates a new datastore backed by PGSQL

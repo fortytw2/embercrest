@@ -30,11 +30,32 @@ CREATE TABLE tiles (
 CREATE TABLE classes (
     id serial PRIMARY KEY,
 
-    name text
+    name          text,
+    initialcost   int,
+    levelcost     int,
+    hpgrowth      int,
+    attackgrowth  int,
+    defensegrowth int,
+    hitgrowth     int,
+    dodgegrowth   int,
+    critgrowth    int,
 
+    minattackrange int,
+    maxattackrange int,
 
+    basehp      int,
+    baseattack  int,
+    basedefense int,
+    basehit     int,
+    basedodge   int,
+    basecrit    int,
 
-
+    hpcap      int,
+    attackcap  int,
+    defensecap int,
+    hitcap     int,
+    dodgecap   int,
+    critcap    int
 );
 
 -- +goose Down

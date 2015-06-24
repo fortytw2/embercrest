@@ -3,24 +3,21 @@ package pgsql
 import (
 	"testing"
 
+	"github.com/fortytw2/embercrest/datastore"
 	"github.com/fortytw2/embercrest/game"
-
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
-var ms *MatchService
-var uuid string
+var ds *datastore.Datastore
 
 func init() {
-	db, err := sqlx.Connect("postgres", "user=postgres password=root dbname=embercrest sslmode=disable")
+	var err error
+	ds, err = NewDatastore()
 	if err != nil {
 		panic(err)
 	}
-	ms = NewMatchService(db)
 }
 
-func getTiles() []game.Tile {
+func getFakeTiles() []game.Tile {
 	t := game.Tile{
 		ID:           1,
 		Name:         "test_tile",
@@ -32,14 +29,14 @@ func getTiles() []game.Tile {
 	return []game.Tile{t}
 }
 
-func TestCreateMatch(t *testing.T) {
-	m := game.NewMatch("luke", "anakin", getTiles())
-	err := ms.CreateMatch(m)
+func TestMatchService(t *testing.T) {
+	m := game.NewMatch("luke", "anakin", getFakeTiles())
+	err := ds.CreateMatch(m)
 	if err != nil {
 		t.Errorf("create match returned error %s", err)
 	}
 
-	match, err := ms.GetMatch(m.UUID)
+	match, err := ds.GetMatch(m.UUID)
 	if err != nil {
 		t.Errorf("get match returned error %s", err)
 	}
@@ -47,7 +44,7 @@ func TestCreateMatch(t *testing.T) {
 		t.Error("match UUID does not match inserted match UUID")
 	}
 
-	matches, err := ms.GetUsersMatches("luke", true)
+	matches, err := ds.GetUsersMatches("luke", true)
 	if err != nil {
 		t.Errorf("create match returned error %s", err)
 	}
@@ -58,18 +55,41 @@ func TestCreateMatch(t *testing.T) {
 
 	newPlayers := []string{"leia", "mace"}
 	matches[0].Players = newPlayers
-	err = ms.UpdateMatch(&matches[0])
+	err = ds.UpdateMatch(&matches[0])
 	if err != nil {
 		t.Errorf("update match returned error %s", err)
 	}
 
-	match, err = ms.GetMatch(m.UUID)
+	match, err = ds.GetMatch(m.UUID)
 	if err != nil {
 		t.Errorf("get match returned error %s", err)
 	}
 	if match.Players[0] != newPlayers[0] && match.Players[1] != newPlayers[1] {
 		t.Error("match was not updated to have new players, get your shit together dude")
+	}
+}
 
+func TestClassService(t *testing.T) {
+	err := ds.CreateClass(&game.Class{Name: "jedi"})
+	if err != nil {
+		t.Errorf("create class returned error %s", err)
 	}
 
+	class, err := ds.GetClass("jedi")
+	if err != nil {
+		t.Errorf("get class returned error %s", err)
+	}
+	if class.Name != "jedi" {
+		t.Errorf("get class returned class with incorrect name %s", class.Name)
+	}
+
+	classes, err := ds.GetClasses()
+	if err != nil {
+		t.Errorf("get all classes returned error %s", err)
+	}
+	if len(classes) != 1 {
+		t.Error("getClasses returns something other than one class? really?")
+	}
+
+	return
 }
