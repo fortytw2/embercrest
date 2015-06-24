@@ -1,4 +1,4 @@
--- +up
+-- +goose Up
 CREATE TABLE users (
     id           serial PRIMARY KEY,
     username     text,
@@ -12,7 +12,11 @@ CREATE TABLE users (
 );
 
 CREATE TABLE matches (
-    id serial PRIMARY KEY
+    id        serial PRIMARY KEY,
+    uuid      text,
+    usernames text[],
+    active    bool,
+    match     json
 );
 
 CREATE TABLE tiles (
@@ -33,7 +37,7 @@ CREATE TABLE classes (
 
 );
 
--- +down
+-- +goose Down
 DROP TABLE users   CASCADE;
 DROP TABLE matches CASCADE;
 DROP TABLE tiles   CASCADE;

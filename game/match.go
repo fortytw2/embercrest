@@ -19,7 +19,6 @@ const (
 
 // Match contains all data that occurs during a game between two players
 type Match struct {
-	ID        int       `json:"-"`
 	UUID      string    `json:"id"`
 	StartTime time.Time `json:"start"`
 	LastTurn  time.Time `json:"-"`

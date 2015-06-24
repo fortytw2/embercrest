@@ -2,3 +2,9 @@ Embercrest ![Embercrest Build Status](https://circleci.com/gh/fortytw2/embercres
 ------
 
 Turn based strategy with PROGRAMMING!
+
+
+Windows
+------
+
+Via `git-lfs` there is a vendored copy of Redis in `vendor/`, use it. 

@@ -1,8 +1,6 @@
 package datastore
 
 import (
-	"time"
-
 	"github.com/fortytw2/embercrest/game"
 	"github.com/fortytw2/embercrest/user"
 )
@@ -25,20 +23,13 @@ type UserService interface {
 	GetLeaderboard() ([]user.User, error)
 }
 
-// MatchSearchParams is used to query for matches
-type MatchSearchParams struct {
-	Username    string
-	SearchStart time.Time
-	SearchEnd   time.Time
-}
-
 // MatchService provides a wrapper around match persistance functions
 type MatchService interface {
 	CreateMatch(*game.Match) error
 	GetMatch(string) (*game.Match, error)
 	UpdateMatch(*game.Match) error
 
-	SearchMatches(*MatchSearchParams) ([]game.Match, error)
+	GetUsersMatches(username string, active bool) ([]game.Match, error)
 	ActiveMatches() ([]game.Match, error)
 }
 

@@ -36,11 +36,11 @@ func GenerateMap(tiles []Tile) Map {
 			if TerrainElementType <= water {
 				lm[i][j] = tiles[0]
 			} else if TerrainElementType <= forest {
-				lm[i][j] = tiles[1]
+				lm[i][j] = tiles[0]
 			} else if TerrainElementType <= mountain {
-				lm[i][j] = tiles[2]
+				lm[i][j] = tiles[0]
 			} else {
-				lm[i][j] = tiles[3]
+				lm[i][j] = tiles[0]
 			}
 		}
 	}
@@ -48,9 +48,9 @@ func GenerateMap(tiles []Tile) Map {
 	return lm
 }
 
-// MarshalJSON makes map a json.Marshaler and ensures that the json encoded Match
+// PrettyMarshalJSON makes map a json.Marshaler and ensures that the json encoded Match
 // is simply a [][]int instead of a huge mess
-func (m Map) MarshalJSON() ([]byte, error) {
+func (m Map) PrettyMarshalJSON() ([]byte, error) {
 	// create the array
 	lm := make([][]int, 20)
 
