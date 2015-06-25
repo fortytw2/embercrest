@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	pg_types "github.com/fortytw2/embercrest/datastore/pgsql/types"
 	"github.com/fortytw2/embercrest/game"
 	"github.com/jmoiron/sqlx"
 	"github.com/jmoiron/sqlx/types"
@@ -28,7 +29,7 @@ func (ms *MatchService) CreateMatch(match *game.Match) error {
 		return err
 	}
 
-	_, err = ms.db.Queryx("INSERT INTO matches (uuid, usernames, active, match) VALUES ($1, $2, $3, $4)", match.UUID, pgStringSlice(match.Players), true, types.JsonText(matchJSON))
+	_, err = ms.db.Queryx("INSERT INTO matches (uuid, usernames, active, match) VALUES ($1, $2, $3, $4)", match.UUID, pg_types.PGStringSlice(match.Players), true, types.JsonText(matchJSON))
 	return err
 }
 
@@ -72,7 +73,7 @@ func (ms *MatchService) UpdateMatch(m *game.Match) (err error) {
 		isActive = true
 	}
 
-	_, err = ms.db.Queryx("UPDATE matches SET usernames = $2, active = $3, match = $4 WHERE uuid = $1", m.UUID, pgStringSlice(m.Players), isActive, types.JsonText(matchJSON))
+	_, err = ms.db.Queryx("UPDATE matches SET usernames = $2, active = $3, match = $4 WHERE uuid = $1", m.UUID, pg_types.PGStringSlice(m.Players), isActive, types.JsonText(matchJSON))
 
 	return
 }

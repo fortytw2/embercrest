@@ -28,10 +28,9 @@ type User struct {
 
 	Elo int `json:"elo"`
 
-	Approved      bool `json:"-"`
-	Admin         bool `json:"-"`
-	PasswordReset bool `json:"-"`
-	Confirmed     bool `json:"-"`
+	Approved  bool `json:"-"`
+	Admin     bool `json:"-"`
+	Confirmed bool `json:"-"`
 }
 
 var (
@@ -53,14 +52,13 @@ func CreateUser(username string, email string, password string) (user *User, err
 	}
 
 	user = &User{
-		Username:      username,
-		Email:         email,
-		PasswordHash:  hash,
-		Elo:           1000,
-		Approved:      false,
-		Admin:         false,
-		PasswordReset: false,
-		Confirmed:     false,
+		Username:     username,
+		Email:        email,
+		PasswordHash: hash,
+		Elo:          1000,
+		Approved:     false,
+		Admin:        false,
+		Confirmed:    false,
 	}
 
 	return
@@ -75,16 +73,6 @@ func (u *User) CheckPassword(password string) bool {
 	return true
 }
 
-// StartPasswordReset sends a password reset email and sets passwordReset to true
-func (u *User) StartPasswordReset() {
-	u.PasswordReset = true
-}
-
-// ConfirmPasswordReset finishes the password reset
-func (u *User) ConfirmPasswordReset(prCode string) error {
-	return nil
-}
-
 // GenConfirmationCode creates a confirmationcode using crypto
 func (u *User) GenConfirmationCode() (*string, error) {
 	return nil, nil
@@ -92,9 +80,5 @@ func (u *User) GenConfirmationCode() (*string, error) {
 
 // Confirm the user based on the confirmation code passed
 func (u *User) Confirm(cc string) error {
-	return nil
-}
-
-func (u *User) validate() error {
 	return nil
 }

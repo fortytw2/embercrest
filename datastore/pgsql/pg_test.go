@@ -5,6 +5,7 @@ import (
 
 	"github.com/fortytw2/embercrest/datastore"
 	"github.com/fortytw2/embercrest/game"
+	"github.com/fortytw2/embercrest/user"
 )
 
 var ds *datastore.Datastore
@@ -89,6 +90,36 @@ func TestClassService(t *testing.T) {
 	}
 	if len(classes) != 1 {
 		t.Error("getClasses returns something other than one class? really?")
+	}
+
+	return
+}
+
+func TestUserService(t *testing.T) {
+	u, err := user.CreateUser("luke", "luke@jedi.org", "iminlovewithmysister")
+	if err != nil {
+		t.Errorf("user.CreateUser returned error %s", err)
+	}
+
+	err = ds.CreateUser(u)
+	if err != nil {
+		t.Errorf("create user returned error %s", err)
+	}
+
+	u, err = ds.GetUser("luke")
+	if err != nil {
+		t.Errorf("get user returned error %s", err)
+	}
+
+	u.Username = "darth luke bro"
+	err = ds.UpdateUser(u)
+	if err != nil {
+		t.Errorf("update user returned error %s", err)
+	}
+
+	u, err = ds.GetUser("darth luke bro")
+	if err != nil {
+		t.Errorf("get user returned error %s", err)
 	}
 
 	return

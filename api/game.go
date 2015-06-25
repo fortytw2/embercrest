@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/fortytw2/embercrest/api/util"
+	"github.com/fortytw2/embercrest/game"
 	"github.com/fortytw2/embercrest/gc"
 	"github.com/julienschmidt/httprouter"
 )
@@ -118,10 +119,23 @@ func Match(gc *gc.GC) httprouter.Handle {
 			return
 		}
 
-		matches, err := gc.GetUserMatches(user.Username)
+		inactiveMatches, err := gc.GetUsersMatches(user.Username, false)
 		if err != nil {
 			util.JSONError(w, err, http.StatusInternalServerError)
 			return
+		}
+		activeMatches, err := gc.GetUsersMatches(user.Username, true)
+		if err != nil {
+			util.JSONError(w, err, http.StatusInternalServerError)
+			return
+		}
+
+		var matches []game.Match
+		for _, m := range activeMatches {
+			matches = append(matches, m)
+		}
+		for _, m := range inactiveMatches {
+			matches = append(matches, m)
 		}
 
 		if len(matches) == 0 {

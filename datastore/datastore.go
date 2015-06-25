@@ -19,7 +19,6 @@ type UserService interface {
 	UpdateUser(*user.User) error
 	GetUser(username string) (*user.User, error)
 
-	GetUserMatches(username string) ([]game.Match, error)
 	GetLeaderboard() ([]user.User, error)
 }
 

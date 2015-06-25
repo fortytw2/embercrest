@@ -1,4 +1,4 @@
-package pgsql
+package types
 
 import (
 	"database/sql/driver"
@@ -38,10 +38,11 @@ func init() {
 	}
 }
 
-type pgStringSlice []string
+// PGStringSlice is a magic array that works with lib/pq for postgres array types
+type PGStringSlice []string
 
 // Value implements database/sql/driver Valuer for StringSlice
-func (s pgStringSlice) Value() (driver.Value, error) {
+func (s PGStringSlice) Value() (driver.Value, error) {
 	var valString string
 	for _, str := range s {
 		if valString == "" {
@@ -58,7 +59,7 @@ func (s pgStringSlice) Value() (driver.Value, error) {
 // Scanners take the database value (in this case as a byte slice)
 // and sets the value of the type.  Here we cast to a string and
 // do a regexp based parse
-func (s pgStringSlice) Scan(src interface{}) error {
+func (s PGStringSlice) Scan(src interface{}) error {
 	asBytes, ok := src.([]byte)
 	if !ok {
 		return error(errors.New("Scan source was not []bytes"))
@@ -66,7 +67,7 @@ func (s pgStringSlice) Scan(src interface{}) error {
 
 	asString := string(asBytes)
 	parsed := parseArray(asString)
-	(s) = pgStringSlice(parsed)
+	(s) = PGStringSlice(parsed)
 
 	return nil
 }

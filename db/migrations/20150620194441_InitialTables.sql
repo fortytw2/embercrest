@@ -1,19 +1,20 @@
 -- +goose Up
 CREATE TABLE users (
     id           serial PRIMARY KEY,
-    username     text,
-    email        text,
-		passwordhash text,
+    username     text UNIQUE,
+    email        text UNIQUE,
+    passwordhash text,
 
     elo          int,
 
-		pwreset      boolean,
-		confirmed    boolean
+    approved  boolean,
+    admin     boolean,
+    confirmed boolean
 );
 
 CREATE TABLE matches (
     id        serial PRIMARY KEY,
-    uuid      text,
+    uuid      text UNIQUE,
     usernames text[],
     active    bool,
     match     json
@@ -21,7 +22,7 @@ CREATE TABLE matches (
 
 CREATE TABLE tiles (
     id         serial PRIMARY KEY,
-    name       text,
+    name       text UNIQUE,
     resistance int,
     defense    int,
     dodge      int
@@ -30,7 +31,7 @@ CREATE TABLE tiles (
 CREATE TABLE classes (
     id serial PRIMARY KEY,
 
-    name          text,
+    name          text UNIQUE,
     initialcost   int,
     levelcost     int,
     hpgrowth      int,

@@ -1,7 +1,6 @@
 package pgsql
 
 import (
-	"github.com/fortytw2/embercrest/game"
 	"github.com/fortytw2/embercrest/user"
 	"github.com/jmoiron/sqlx"
 )
@@ -18,20 +17,53 @@ func NewUserService(db *sqlx.DB) *UserService {
 	}
 }
 
-func (usvc *UserService) CreateUser(u *user.User) (err error) {
-	return
+// CreateUser adds a user to the datastore
+func (us *UserService) CreateUser(u *user.User) (err error) {
+	_, err = us.db.NamedQuery("INSERT INTO users (username, email, passwordhash, elo, approved, admin, confirmed) VALUES (:username, :email, :passwordhash, :elo, :approved, :admin, :confirmed)", u)
+	return err
 }
-func (usvc *UserService) UpdateUser(u *user.User) (err error) {
-	return
-}
-func (usvc *UserService) GetUser(username string) (u *user.User, err error) {
+
+// UpdateUser updates a database user by ID
+func (us *UserService) UpdateUser(u *user.User) (err error) {
+	_, err = us.db.NamedQuery(`UPDATE users SET username = :username,
+																					 passwordhash = :passwordhash,
+																				 	 email = :email,
+																					 elo = :elo,
+																					 approved = :approved,
+																					 admin = :admin,
+																					 confirmed = :confirmed
+																					 WHERE id = :id`, u)
+
 	return
 }
 
-func (usvc *UserService) GetUserMatches(username string) (matches []game.Match, err error) {
+// GetUser returns a user by their username
+func (us *UserService) GetUser(username string) (u *user.User, err error) {
+	row := us.db.QueryRowx("SELECT * FROM users WHERE username = $1;", username)
+
+	var scanUser user.User
+	err = row.StructScan(&scanUser)
+	if err != nil {
+		return
+	}
+	u = &scanUser
+
 	return
 }
 
-func (usvc *UserService) GetLeaderboard() (users []user.User, err error) {
+// GetLeaderboard returns the top 25 users by Elo
+func (us *UserService) GetLeaderboard() (users []user.User, err error) {
+	var rows *sqlx.Rows
+	rows, err = us.db.Queryx("SELECT * FROM users SORT BY elo DESC LIMIT 25;")
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		var u user.User
+		rows.StructScan(&u)
+		users = append(users, u)
+	}
+
 	return
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/fortytw2/embercrest/datastore"
 	"github.com/jmoiron/sqlx"
+	// import the postgres driver
 	_ "github.com/lib/pq"
 )
 
