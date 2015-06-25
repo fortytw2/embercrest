@@ -18,11 +18,29 @@ func NewTileService(db *sqlx.DB) *TileService {
 }
 
 // CreateTile adds a tile to the database
-func (tsvc *TileService) CreateTile(c *game.Tile) (err error) {
+func (ts *TileService) CreateTile(t *game.Tile) (err error) {
+	_, err = ts.db.NamedQuery(`INSERT INTO tiles
+												(name, resistance, defensebonus, dodgebonus) VALUES
+												(:name, :resistance, :defensebonus, :dodgebonus);`, *t)
 	return
 }
 
-// GetTilees returns all tilees currently in Embercrest
-func (tsvc *TileService) GetTiles() (tilees []game.Tile, err error) {
+// GetTiles returns all tiles
+func (ts *TileService) GetTiles() (tiles []game.Tile, err error) {
+	var rows *sqlx.Rows
+	rows, err = ts.db.Queryx("SELECT * FROM tiles;")
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		var tile game.Tile
+		err = rows.StructScan(&tile)
+		if err != nil {
+			return
+		}
+
+		tiles = append(tiles, tile)
+	}
 	return
 }

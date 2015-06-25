@@ -70,31 +70,6 @@ func TestMatchService(t *testing.T) {
 	}
 }
 
-func TestClassService(t *testing.T) {
-	err := ds.CreateClass(&game.Class{Name: "jedi"})
-	if err != nil {
-		t.Errorf("create class returned error %s", err)
-	}
-
-	class, err := ds.GetClass("jedi")
-	if err != nil {
-		t.Errorf("get class returned error %s", err)
-	}
-	if class.Name != "jedi" {
-		t.Errorf("get class returned class with incorrect name %s", class.Name)
-	}
-
-	classes, err := ds.GetClasses()
-	if err != nil {
-		t.Errorf("get all classes returned error %s", err)
-	}
-	if len(classes) != 1 {
-		t.Error("getClasses returns something other than one class? really?")
-	}
-
-	return
-}
-
 func TestUserService(t *testing.T) {
 	u, err := user.CreateUser("luke", "luke@jedi.org", "iminlovewithmysister")
 	if err != nil {
@@ -120,6 +95,23 @@ func TestUserService(t *testing.T) {
 	u, err = ds.GetUser("darth luke bro")
 	if err != nil {
 		t.Errorf("get user returned error %s", err)
+	}
+
+	return
+}
+
+func TestTileService(t *testing.T) {
+	err := ds.CreateTile(&game.Tile{Name: "dirt"})
+	if err != nil {
+		t.Errorf("create tile returned error %s", err)
+	}
+
+	tiles, err := ds.GetTiles()
+	if err != nil {
+		t.Errorf("get all tiles returned error %s", err)
+	}
+	if len(tiles) != 1 {
+		t.Error("GetTiles returns something other than one tile...")
 	}
 
 	return

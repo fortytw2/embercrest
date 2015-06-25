@@ -21,11 +21,11 @@ CREATE TABLE matches (
 );
 
 CREATE TABLE tiles (
-    id         serial PRIMARY KEY,
-    name       text UNIQUE,
-    resistance int,
-    defense    int,
-    dodge      int
+    id           serial PRIMARY KEY,
+    name         text UNIQUE,
+    resistance   int,
+    defensebonus int,
+    dodgebonus   int
 );
 
 CREATE TABLE classes (
