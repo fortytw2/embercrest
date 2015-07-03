@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/fortytw2/embercrest/api/util"
-	"github.com/fortytw2/embercrest/game"
 	"github.com/fortytw2/embercrest/gc"
 	"github.com/julienschmidt/httprouter"
 )
@@ -92,6 +91,11 @@ func Draft(gc *gc.GC) httprouter.Handle {
 			return
 		}
 
+		if match.Players[0] != user.Username && match.Players[1] != user.Username {
+			util.JSONError(w, errors.New("you can't draft for another player"), http.StatusUnauthorized)
+			return
+		}
+
 		if match.PlayerTurn != user.Username {
 			util.JSONError(w, errors.New("it is not your turn to draft"), http.StatusNotFound)
 			return
@@ -110,7 +114,28 @@ func Draft(gc *gc.GC) httprouter.Handle {
 	}
 }
 
-// Match returns the users current Matches
+// MatchHistory returns all of a users past matches
+func MatchHistory(gc *gc.GC) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		inactiveMatches, err := gc.GetUsersMatches(ps.ByName("user"), false)
+		if err != nil {
+			util.JSONError(w, err, http.StatusInternalServerError)
+			return
+		}
+
+		if len(inactiveMatches) == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "no matches found"})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(inactiveMatches)
+	}
+}
+
+// Match returns a single match by id
 func Match(gc *gc.GC) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		user, err := util.Authenticate(r, gc.UserService)
@@ -119,34 +144,25 @@ func Match(gc *gc.GC) httprouter.Handle {
 			return
 		}
 
-		inactiveMatches, err := gc.GetUsersMatches(user.Username, false)
-		if err != nil {
-			util.JSONError(w, err, http.StatusInternalServerError)
-			return
-		}
-		activeMatches, err := gc.GetUsersMatches(user.Username, true)
+		match, err := gc.GetMatch(ps.ByName("id"))
 		if err != nil {
 			util.JSONError(w, err, http.StatusInternalServerError)
 			return
 		}
 
-		var matches []game.Match
-		for _, m := range activeMatches {
-			matches = append(matches, m)
+		if match.Players[0] != user.Username && match.Players[1] != user.Username {
+			util.JSONError(w, errors.New("cannot view active match not belonging to you"), http.StatusUnauthorized)
+			return
 		}
-		for _, m := range inactiveMatches {
-			matches = append(matches, m)
-		}
-
-		if len(matches) == 0 {
+		if match == nil {
 			w.WriteHeader(http.StatusNotFound)
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{"message": "no matches in progress"})
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "no match found"})
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(matches)
+		json.NewEncoder(w).Encode(match)
 	}
 }
 
@@ -177,7 +193,7 @@ func Leaderboard(gc *gc.GC) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		users, err := gc.GetLeaderboard()
 		if err != nil {
-			util.JSONError(w, err, http.StatusNotFound)
+			util.JSONError(w, err, http.StatusInternalServerError)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -190,8 +206,7 @@ func Classes(gc *gc.GC) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.Header().Set("Content-Type", "application/json")
 		classes, _ := gc.GetClasses()
-
-		json.NewEncoder(w).Encode(map[string]interface{}{"classes": classes})
+		json.NewEncoder(w).Encode(classes)
 	}
 }
 
@@ -200,8 +215,7 @@ func Tiles(gc *gc.GC) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.Header().Set("Content-Type", "application/json")
 		tiles, _ := gc.GetTiles()
-
-		json.NewEncoder(w).Encode(map[string]interface{}{"tiles": tiles})
+		json.NewEncoder(w).Encode(tiles)
 	}
 }
 

@@ -18,6 +18,7 @@ func Authenticate(r *http.Request, users datastore.UserService) (u *user.User, e
 	}
 	u, err = users.GetUser(username)
 	if err != nil {
+		err = errors.New("no user found")
 		return
 	}
 	if err = abdi.Check(password, u.PasswordHash); err != nil {

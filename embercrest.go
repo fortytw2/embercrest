@@ -34,7 +34,7 @@ func main() {
 	router.GET("/leaderboard", api.Leaderboard(gc))
 
 	// authenticated API
-	router.GET("/matches", api.Match(gc))
+	router.GET("/matches/:user", api.MatchHistory(gc))
 
 	router.POST("/queue", api.Queue(gc))
 	router.DELETE("/queue", api.CancelQueue(gc))

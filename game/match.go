@@ -107,6 +107,17 @@ func (m *Match) MakeMoves(moves []Move) error {
 }
 
 func (m *Match) makeMove(move Move) error {
+	err := m.validateMove(move)
+	if err != nil {
+		return err
+	}
+
+	u, _ := m.findUnit(move.UnitUUID)
+	endPoint := move.Path[len(move.Path)]
+
+	u.Coordinate = endPoint
+	m.updateUnit(u)
+
 	return nil
 }
 
@@ -160,18 +171,19 @@ func (m *Match) findUnit(id string) (*Unit, error) {
 }
 
 func (m *Match) checkAttack(unit *Unit, attackUnit string) error {
+	if attackUnit == "" {
+		return nil
+	}
+
 	u, err := m.findUnit(attackUnit)
 	if err != nil {
 		return err
 	}
 	// ensure the unit being attacked is between the min and max attack range
-	if unit.Coordinate.X+unit.MinAttackRange <= u.Coordinate.X && unit.Coordinate.X+unit.MaxAttackRange >= u.Coordinate.X {
-
-	} else {
-		return fmt.Errorf("unit %s not within range to attack unit %s", unit.UUID, attackUnit)
+	if unit.Coordinate.X+unit.MinAttackRange <= u.Coordinate.X && unit.Coordinate.X+unit.MaxAttackRange >= u.Coordinate.X && unit.Coordinate.Y+unit.MinAttackRange <= u.Coordinate.Y && unit.Coordinate.Y+unit.MaxAttackRange >= u.Coordinate.Y {
+		return nil
 	}
-
-	return nil
+	return fmt.Errorf("unit %s not within range to attack unit %s", unit.UUID, attackUnit)
 }
 
 func (m *Match) checkPath(unit *Unit, path []Point) error {
@@ -192,6 +204,15 @@ func (m *Match) checkPath(unit *Unit, path []Point) error {
 	}
 	return nil
 
+}
+
+func (m *Match) updateUnit(unit *Unit) {
+	for i, u := range m.Armies[m.PlayerTurn] {
+		if u.UUID == unit.UUID {
+			m.Armies[m.PlayerTurn][i] = *unit
+			return
+		}
+	}
 }
 
 func (m *Match) testDraftOver() bool {
